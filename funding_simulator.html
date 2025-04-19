@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Fund the Future of Sceince!!</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #e0f7fa, #ffffff);
+      padding: 2rem;
+    }
+    .container {
+      max-width: 800px;
+      margin: auto;
+      background: white;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+      animation: fadeIn 1s ease-in-out;
+    }
+    h1, h2 {
+      text-align: center;
+    }
+    .header-image {
+      width: 100%;
+      max-height: 300px;
+      object-fit: cover;
+      border-radius: 12px;
+      margin: 1rem 0;
+    }
+    .topic {
+      margin-bottom: 2rem;
+      animation: slideIn 0.5s ease-in-out;
+    }
+    input[type="range"] {
+      width: 100%;
+    }
+    .submit-btn {
+      margin-top: 2rem;
+      display: block;
+      width: 100%;
+      padding: 1rem;
+      background-color: #007acc;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .submit-btn:hover {
+      background-color: #005fa3;
+    }
+    .outcomes {
+      margin-top: 2rem;
+      background: #eef;
+      padding: 1rem;
+      border-radius: 8px;
+    }
+    .budget {
+      font-size: 1.2rem;
+      font-weight: bold;
+      text-align: center;
+      margin-top: 1rem;
+      color: #007acc;
+    }
+    .progress-container {
+      background: #ddd;
+      border-radius: 10px;
+      overflow: hidden;
+      height: 20px;
+      margin: 1rem 0;
+    }
+    .progress-bar {
+      height: 100%;
+      background-color: #007acc;
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+    .tooltip-wrapper {
+      position: relative;
+      display: inline-block;
+      cursor: help;
+    }
+    .tooltip-wrapper .tooltip {
+      visibility: hidden;
+      background-color: #333;
+      color: #fff;
+      text-align: left;
+      border-radius: 5px;
+      padding: 8px 10px;
+      position: absolute;
+      z-index: 1;
+      bottom: 125%;
+      left: 0;
+      width: 250px;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      font-size: 0.9rem;
+    }
+    .tooltip-wrapper:hover .tooltip {
+      visibility: visible;
+      opacity: 1;
+    }
+    #warning {
+      color: red;
+      font-weight: bold;
+      text-align: center;
+      margin-top: 1rem;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(-20px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Fund the Future of Science</h1>
+    <img src="https://img.freepik.com/free-vector/flat-laboratory-room-with-microscope_23-2148885022.jpg?t=st=1745021611~exp=1745025211~hmac=a7a04b67c3fb80cba232c016a7ee53844a3cf3cf95421a7f6ffb1621de0cc641&w=1380" 
+         alt="Laboratory Illustration" 
+         class="header-image">
+
+    <p>This activity places you in the driver's seat! You have $100 million to allocate across 3 randomly chosen scientific projects. Use the sliders below to distribute your funds. (Sliders automatically rebalance if you go over.)</p>
+
+    <div id="remaining" class="budget">Remaining Budget: $100M</div>
+    <div class="progress-container"><div id="progressBar" class="progress-bar"></div></div>
+
+    <form id="fundingForm">
+      <div id="topicsContainer"></div>
+      <button type="submit" class="submit-btn">Submit Funding Choices</button>
+    </form>
+
+    <div id="warning"></div>
+    <div id="results" class="outcomes"></div>
+    <p>This activity has been developed using resources found at <a href="https://geeksforgeeks.org">GeeksforGeeks </a> </p>
+
+  </div>
+
+  <!-- Sound Effects -->
+  <audio id="sliderSound" src="https://assets.mixkit.co/sfx/preview/mixkit-interface-click-1126.mp3"></audio>
+  <audio id="submitSound" src="https://assets.mixkit.co/sfx/preview/mixkit-bell-notification-933.mp3"></audio>
+
+  <script>
+    const topics = [
+      { title: "Cancer Treatment Innovation", desc: "Advancing targeted therapies and immunotherapies.", tip: "This project needs at least $40M for significant trials. Below $20M has minimal clinical impact." },
+      { title: "Pandemic Response Tech", desc: "Improving detection and containment technologies.", tip: "Even $15M can spark scalable systems. Over $30M accelerates nationwide deployment." },
+      { title: "Brain-Computer Interfaces", desc: "Merging human cognition with machines.", tip: "Over $40M unlocks deep integration studies. Anything under $10M barely funds prototypes." },
+      { title: "Climate Change Modeling", desc: "Predicting climate impact with high-resolution simulations.", tip: "Needs around $25M+ for high-res data and global access." },
+      { title: "Carbon Capture Research", desc: "Pulling CO₂ out of the atmosphere efficiently.", tip: "$30M+ needed for field testing, under $15M yields mostly lab work." },
+      { title: "Space Habitation Design", desc: "Designing sustainable habitats beyond Earth.", tip: "Pushing the frontier — $50M for tech validation; $20M for concepts." },
+      { title: "Asteroid Deflection Systems", desc: "Developing planetary defense systems.", tip: "High-risk, high-reward: $35M+ is required for credible testing." },
+      { title: "Quantum Computing Hardware", desc: "Pushing the limits of computation.", tip: "Highly experimental — $25M+ begins viable chip design." },
+      { title: "AI Ethics and Safety", desc: "Ensuring beneficial and controllable AI.", tip: "$15M is impactful for oversight frameworks. Greater funding helps global adoption." },
+      { title: "Clean Water Systems", desc: "Delivering safe water to low-income regions.", tip: "Strong results even with $10M. $25M transforms entire regions." }
+    ];
+
+    const getRandomTopics = () => [...topics].sort(() => Math.random() - 0.5).slice(0, 3);
+
+    const selectedTopics = getRandomTopics();
+    const topicsContainer = document.getElementById("topicsContainer");
+    const results = document.getElementById("results");
+    const remainingDisplay = document.getElementById("remaining");
+    const progressBar = document.getElementById("progressBar");
+    const warningBox = document.getElementById("warning");
+    const sliderSound = document.getElementById("sliderSound");
+    const submitSound = document.getElementById("submitSound");
+    const sliders = [];
+
+    // Preload audio
+    sliderSound.load();
+    submitSound.load();
+
+    function playSound(audio) {
+      if (!audio) return;
+      audio.currentTime = 0;
+      audio.play().catch((e) => {
+        console.warn("Sound playback failed:", e.message);
+      });
+    }
+
+    selectedTopics.forEach((topic, i) => {
+      const div = document.createElement("div");
+      div.className = "topic";
+      div.innerHTML = `
+        <h2>${topic.title}</h2>
+        <p>${topic.desc}</p>
+        <div class="tooltip-wrapper">
+          <label>Funding: $<span id="display${i}">0</span>M</label>
+          <div class="tooltip">${topic.tip}</div>
+        </div>
+        <input type="range" min="0" max="100" value="0" id="slider${i}" data-idx="${i}">
+      `;
+      topicsContainer.appendChild(div);
+
+      const slider = div.querySelector(`#slider${i}`);
+      const display = div.querySelector(`#display${i}`);
+      sliders.push({ slider, display });
+
+      slider.addEventListener('input', (e) => handleSliderInput(e, i));
+    });
+
+    function getTotalFunding() {
+      return sliders.reduce((sum, { slider }) => sum + parseInt(slider.value), 0);
+    }
+
+    function updateRemaining() {
+      const total = getTotalFunding();
+      const remaining = 100 - total;
+      remainingDisplay.textContent = `Remaining Budget: $${remaining}M`;
+      progressBar.style.width = `${total}%`;
+    }
+
+    function handleSliderInput(e, changedIdx) {
+      const newValue = parseInt(e.target.value);
+      const previousValue = parseInt(sliders[changedIdx].slider.value);
+      const currentTotal = getTotalFunding();
+      const projectedTotal = currentTotal - previousValue + newValue;
+
+      sliders[changedIdx].slider.value = newValue;
+      sliders[changedIdx].display.textContent = newValue;
+
+      playSound(sliderSound);
+
+      if (projectedTotal <= 100) {
+        updateRemaining();
+        return;
+      }
+
+      let excess = projectedTotal - 100;
+      const otherSliders = sliders.filter((_, i) => i !== changedIdx);
+
+      otherSliders.sort((a, b) => parseInt(b.slider.value) - parseInt(a.slider.value));
+
+      for (let { slider, display } of otherSliders) {
+        let current = parseInt(slider.value);
+        if (current === 0) continue;
+
+        let reduction = Math.min(current, excess);
+        current -= reduction;
+        excess -= reduction;
+        slider.value = current;
+        display.textContent = current;
+
+        if (excess <= 0) break;
+      }
+
+      if (excess > 0) {
+        sliders[changedIdx].slider.value = newValue - excess;
+        sliders[changedIdx].display.textContent = newValue - excess;
+      }
+
+      updateRemaining();
+    }
+
+    document.getElementById("fundingForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const total = getTotalFunding();
+      results.innerHTML = "";
+      warningBox.textContent = "";
+
+      if (total < 100) {
+        warningBox.textContent = "⚠️ Please allocate the full $100M before submitting!";
+        return;
+      }
+
+      playSound(submitSound);
+
+      sliders.forEach(({ slider }, i) => {
+        const amount = parseInt(slider.value);
+        let impact = "";
+
+        if (amount >= 40) {
+          impact = "🚀 <strong>Breakthrough!</strong>🚀 This project has given promising results and reshapes its field.";
+        } else if (amount >= 30) {
+          impact = "🔧 Solid progress: Research is steady and influential within scientific circles, but no significant breakthroughs happen.";
+        } else if (amount >= 18) {
+          impact = "📉 Momentum builds, but no major breakthroughs. Progress is limited.";
+        } else if (amount > 0) {
+          impact = "🧪 Only a few experiments make it to the lab. Field potential remains untapped.";
+        } else {
+          impact = "❌ No funding — the project has been underfunded and will be shelved until future support arises.";
+        }
+
+        results.innerHTML += `<h3>${selectedTopics[i].title}</h3><p style="animation: fadeIn 0.5s ease-in;">${impact}</p>`;
+      });
+    });
+
+    updateRemaining();
+  </script>
+</body>
+</html>
